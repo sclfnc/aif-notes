@@ -1,0 +1,63 @@
+% ============================================================
+% COURSE-SPECIFIC — Artificial Intelligence Fundamentals.
+% Loaded by the shared main.tex after housestyle + common-preamble.
+% ============================================================
+
+% --- Title-block metadata (consumed by main.tex) ---
+\newcommand{\coursetitle}{Artificial Intelligence Fundamentals}
+% PLACEHOLDER subtitle — review and replace with the actual topic list.
+\newcommand{\coursesubtitle}{Search, knowledge representation, reasoning, planning, learning}
+\newcommand{\courseyear}{2026/2027}
+
+% --- Paragraph heading (not defined in housestyle) ---
+\titleformat{\paragraph}[block]%
+  {\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}{0pt}{2.5ex plus 0.8ex minus 0.2ex}{0.8em}
+
+% --- Course math macros ---
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+
+% --- House callouts: box-free run-in (unnumbered) ---
+\makeatletter
+\newcommand{\callout@head}[1]{%
+  \@ifnextchar\bgroup{\callout@headtitled{#1}}
+    {{\bfseries\color{accent}#1.}\hspace{0.4em}\ignorespaces}}
+\newcommand{\callout@headtitled}[2]{%
+  {\bfseries\color{accent}#1\if\relax\detokenize{#2}\relax\else\ (#2)\fi.}%
+  \hspace{0.4em}\ignorespaces}
+\newenvironment{definitionbox}{\par\addvspace{9pt}\small\noindent\callout@head{Definition}}{\par\addvspace{9pt}}
+\newenvironment{notebox}{\par\addvspace{9pt}\small\noindent\callout@head{Note}}{\par\addvspace{9pt}}
+\newenvironment{examplebox}{\par\addvspace{9pt}\small\noindent\callout@head{Example}}{\par\addvspace{9pt}}
+\makeatother
+
+% Bibliography resource (biblatex backend loaded in common-preamble)
+\addbibresource{references.bib}
+
+% --- Links (hyperref + cleveref last, before \begin{document}) ---
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks  = true,
+  linkcolor   = accent,
+  citecolor   = accent,
+  urlcolor    = accent,
+  pdfauthor   = {Francesco Secoli},
+  pdftitle    = {Artificial Intelligence Fundamentals},
+}
+\usepackage[capitalise, noabbrev]{cleveref}
+\crefname{housethm}{Result}{Results}
+\Crefname{housethm}{Result}{Results}
+
+% --- Document body: the section list (expanded by main.tex) ---
+\newcommand{\coursebody}{%
+  \input{sec/_01_introduction}%
+  \newpage
+  \printbibliography
+}
