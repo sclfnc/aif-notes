@@ -5,8 +5,7 @@
 
 % --- Title-block metadata (consumed by main.tex) ---
 \newcommand{\coursetitle}{Artificial Intelligence Fundamentals}
-% PLACEHOLDER subtitle — review and replace with the actual topic list.
-\newcommand{\coursesubtitle}{Search, knowledge representation, reasoning, planning, learning}
+\newcommand{\coursesubtitle}{Search, evolutionary optimization and artificial life, logical and probabilistic agents}
 \newcommand{\courseyear}{2026/2027}
 
 % --- Paragraph heading (not defined in housestyle) ---
@@ -52,12 +51,50 @@
   pdftitle    = {Artificial Intelligence Fundamentals},
 }
 \usepackage[capitalise, noabbrev]{cleveref}
+% Every house environment shares the counter housethm; alias it per environment
+% so that \cref prints the environment's own name (tex-standard, section 1).
+\usepackage{etoolbox}
+\AtBeginEnvironment{theorem}{\crefalias{housethm}{housethm@theorem}}
+\AtBeginEnvironment{lemma}{\crefalias{housethm}{housethm@lemma}}
+\AtBeginEnvironment{proposition}{\crefalias{housethm}{housethm@proposition}}
+\AtBeginEnvironment{corollary}{\crefalias{housethm}{housethm@corollary}}
+\AtBeginEnvironment{definition}{\crefalias{housethm}{housethm@definition}}
+\AtBeginEnvironment{example}{\crefalias{housethm}{housethm@example}}
+\AtBeginEnvironment{remark}{\crefalias{housethm}{housethm@remark}}
+\AtBeginEnvironment{assumption}{\crefalias{housethm}{housethm@assumption}}
+\crefname{housethm@theorem}{Theorem}{Theorems}
+\crefname{housethm@lemma}{Lemma}{Lemmas}
+\crefname{housethm@proposition}{Proposition}{Propositions}
+\crefname{housethm@corollary}{Corollary}{Corollarys}
+\crefname{housethm@definition}{Definition}{Definitions}
+\crefname{housethm@example}{Example}{Examples}
+\crefname{housethm@remark}{Remark}{Remarks}
+\crefname{housethm@assumption}{Assumption}{Assumptions}
+% Fallback, printed only by an environment without an alias.
 \crefname{housethm}{Result}{Results}
 \Crefname{housethm}{Result}{Results}
 
 % --- Document body: the section list (expanded by main.tex) ---
 \newcommand{\coursebody}{%
   \input{sec/_01_introduction}%
+  \input{sec/_02_agents}%              L2
+  % --- Solving problems by search ---
+  % \input{sec/_03_search}%            L3 uninformed + informed
+  % \input{sec/_04_local_search}%      L4
+  % \input{sec/_05_csp}%               L5
+  % \input{sec/_06_games}%             L6
+  % --- Evolutionary optimization and artificial life ---
+  % \input{sec/_07_evolutionary}%      L8
+  % \input{sec/_08_novelty_qd}%        L9
+  % \input{sec/_09_artificial_life}%   L10
+  % --- Logical agents ---
+  % \input{sec/_10_propositional_logic}% L12
+  % \input{sec/_11_first_order_logic}%  L13
+  % \input{sec/_12_planning}%           L14
+  % --- Probabilistic agents ---
+  % \input{sec/_13_bayesian_networks}%  L15
+  % \input{sec/_14_hmm}%                L16
+  % \input{sec/_15_multi_agent}%        L17 (placement provisional)
   \newpage
   \printbibliography
 }

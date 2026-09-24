@@ -1,4 +1,199 @@
-\section{Introduction}
+% DRAFT (2026-09-24): written by Claude from the slides and the lecture notes;
+% not yet reviewed by the author.
+\section{Introduction}\label{sec:introduction}
 
-Placeholder section for the \emph{Artificial Intelligence Fundamentals} notes.
-Replace this stub with the first lecture's content.
+% ── slides L1 p.4–12 ──
+Artificial intelligence (AI) is a large family of methods. Machine learning
+(ML) is one member of the family, deep learning (DL) is a branch of machine
+learning, and the large language models (LLMs) behind tools such as ChatGPT and
+Copilot are a branch of deep learning. This course covers, in the lecturer's
+words, ``all AI, but learning'': methods that answer questions broader than
+those of machine learning and that run, mostly unseen, inside many AI-based
+tools. Some learning may still appear along the way, and
+\cref{sec:intro-hybrid} gives the reason for this choice.
+
+% Grouping of the lectures of p.5 into the four blocks of p.4; planning sits
+% with logical agents as in AIMA part III (p.6); the slides place multi-agent
+% systems in no block.
+After a lecture on the design of intelligent agents (\cref{sec:agents}), the
+course runs in four blocks:
+\begin{itemize}
+  \item \textbf{Solving problems by search}: uninformed and informed search,
+    local search, constraint satisfaction problems, search in games.
+  \item \textbf{Evolutionary optimization and artificial life}: evolutionary
+    optimization, novelty-based search and quality-diversity, artificial life.
+  \item \textbf{Logical agents}: inference in propositional and first-order
+    logic, planning.
+  \item \textbf{Probabilistic agents}: Bayesian networks, hidden Markov models.
+\end{itemize}
+Multi-agent systems close the course.
+
+\subsection{Symbolic AI}\label{sec:intro-symbolic}
+
+% ── slides L1 p.19 ──
+Symbolic AI was the dominant paradigm of the field from the 1950s to the
+1990s. It represents the world at a high level, in a form that humans can read
+and interpret, and its building block is the symbol.
+
+\begin{definition}[Symbol]\label{def:symbol}
+  A \textbf{symbol} is a meaningful pattern that can be manipulated.
+\end{definition}
+
+A symbol stands for something else, as the string \texttt{cat} stands for the
+animal, and a program can operate on it: compare it, copy it, combine it with
+other symbols into rules. Semiotics, the study of signs and of how they carry
+meaning, names the two sides of this relation: the pattern is the
+\textbf{signifier}, and what it stands for is the \textbf{signified}.
+
+Where do the symbols of a machine come from? The lecture gives two answers.
+Either humans provide them, and then the machine's symbols mean something only
+because someone who already had symbols gave them their meaning: a
+chicken-and-egg problem. Or the computer builds its own low-level
+representations from raw data, which is sub-symbolic manipulation
+(\cref{sec:intro-subsymbolic}). The lecturer relates this circularity to
+Hofstadter's ``strange loops''.
+
+\subsection{The symbol grounding problem}\label{sec:intro-grounding}
+
+% ── slides L1 p.20 ──
+If a symbol means something only to the humans who supplied it, the system that
+manipulates the symbol does not know what it manipulates. Harnad named this
+difficulty.
+
+\begin{definition}[Symbol grounding problem]\label{def:grounding}
+  The \textbf{symbol grounding problem} asks how a symbol is connected to the
+  real-world object it stands for: what makes the connection, who makes it,
+  and how. In Harnad's words: ``How can the semantic interpretation of a
+  formal symbol system be made intrinsic to the system, rather than just
+  parasitic on the meanings in our heads?''\footnote{S.~Harnad, ``The symbol
+  grounding problem'', \emph{Physica D} 42 (1990), pp.~335--346.}
+\end{definition}
+
+A symbol represents something outside the system, so the answer requires what
+Hofstadter calls ``jumping out of the system''. Formal logic meets the same
+limit in Gödel's incompleteness theorem: every consistent, effectively
+axiomatized formal system that can express elementary arithmetic contains a
+true statement that it cannot prove, so establishing that statement requires a
+step outside the system.
+
+\subsection{The physical symbol system hypothesis}\label{sec:intro-pssh}
+
+% ── slides L1 p.21 ──
+Suppose that symbols can be grounded. Is manipulating them then enough for
+intelligence? Newell and Simon answered yes, in the form of a hypothesis about
+a particular kind of system.
+
+\begin{definition}[Physical symbol system]\label{def:pss}
+  A \textbf{physical symbol system} is a system that manipulates symbols to
+  produce other symbols. It is \emph{physical} because the manipulation is a
+  physical process, which consumes energy.
+\end{definition}
+
+In the lecture's terms, humans are physical symbol systems, and so are digital
+computers, since both manipulate symbols. The \textbf{physical symbol system
+hypothesis} (PSSH) states:
+\begin{quote}
+  A physical symbol system has the necessary and sufficient means for general
+  intelligent action.\footnote{A.~Newell and H.~A.~Simon, ``Computer science as
+  empirical inquiry: symbols and search'', \emph{Communications of the ACM}
+  19(3) (1976), pp.~113--126.}
+\end{quote}
+% The slide drops "general"; the wording and both glosses below follow the
+% 1976 paper.
+Newell and Simon explain both halves. \emph{Necessary} means that ``any system
+that exhibits general intelligence will prove upon analysis to be a physical
+symbol system''. \emph{Sufficient} means that ``any physical symbol system of
+sufficient size can be organized further to exhibit general intelligence''.
+The claim is empirical, which is why it is a hypothesis and not a theorem:
+evidence can support it or refute it. If it holds, a digital computer, suitably
+organized, can act with general intelligence.
+
+\subsection{Intelligence is not consciousness}\label{sec:intro-consciousness}
+
+% ── slides L1 p.22 ──
+A system that acts intelligently need not be conscious: intelligence and
+consciousness are different properties. Consciousness is usually tied to
+subjective experience. In the sense of Nagel's essay ``What is it like to be a
+bat?'',\footnote{T.~Nagel, ``What is it like to be a bat?'', \emph{The
+Philosophical Review} 83(4) (1974).} a being is conscious if there is something
+it is like to be that being. Subjective experience is hard to detect from
+outside: dissecting a system and studying its behavior may not be enough. A
+\textbf{zombie}, which behaves exactly like a person but has no experience, would
+pass every behavioral test. Searle's Chinese room makes a related point about
+understanding: a person who follows written rules to manipulate Chinese
+characters can answer questions in Chinese without understanding any
+Chinese.\footnote{J.~R.~Searle, ``Minds, brains, and programs'',
+\emph{Behavioral and Brain Sciences} 3(3) (1980).}
+
+If consciousness exists, materialism holds that it is a by-product of the body,
+located ``somewhere'' in it; dualism instead treats the mind as a substance
+different from the body. Hofstadter argues that what matters is the symbolic
+pattern and not its physical substrate: silicon chips organized in an
+equivalent way could support consciousness just as neurons do. The lecture
+leaves the question open.
+
+\subsection{Sub-symbolic representations}\label{sec:intro-subsymbolic}
+
+% ── slides L1 p.24–25 (images only; the reading follows the slide titles) ──
+Symbolic descriptions break down when the world varies more than a set of rules
+can anticipate. The alternative is to let the machine build its own
+representation.
+
+\begin{definition}[Sub-symbolic representation]\label{def:subsymbolic}
+  A \textbf{sub-symbolic representation} encodes a concept as a numeric pattern
+  spread over many low-level units, such as the weights of a neural network,
+  instead of as a single symbol that a human can read.
+\end{definition}
+
+\begin{example}[Recognizing a cat]\label{ex:cat}
+  This example contrasts the two approaches. A symbolic system describes a cat
+  through symbols for its parts, such as two eyes, whiskers and pointed ears,
+  and through rules that combine them. Real photographs of cats vary in pose,
+  breed, lighting and framing, and each new variation breaks some rule. A
+  sub-symbolic system learns its representation from many example images and
+  absorbs the variation, at the price of a representation that no human can
+  read.
+\end{example}
+
+\subsection{Models of the world}\label{sec:intro-models}
+
+% ── slides L1 p.26 (images only: a map of Pisa; house features pointing to a
+% selling price; a path through a labyrinth) ──
+Whatever its representation, an AI system reasons about a \textbf{model of the
+world}: a representation of the part of reality that the system works on. The
+lecture distinguishes three kinds of model, by the question that each answers.
+\begin{itemize}
+  \item \textbf{Descriptive}: how is the world? A map of Pisa describes where
+    things are.
+  \item \textbf{Predictive}: what value will an unobserved quantity take? A
+    model estimates the selling price of a house from its floor area, its
+    number of rooms and its energy efficiency. Machine learning builds models
+    of this kind.
+  \item \textbf{Decisional}: what should be done to reach a goal? A path through
+    a labyrinth answers it; the search methods of the course answer questions
+    of this kind.
+\end{itemize}
+
+\subsection{Hybrid systems}\label{sec:intro-hybrid}
+
+% ── slides L1 p.27–28; p.29–31 (AI scientist, agentic web, evolutionary
+% computation) are outside the agreed scope ──
+Machine learning maps inputs $X$ to outputs $Y$. Building the map (training)
+requires huge amounts of data, and the more complex the mapping, the more data
+it requires. Using the map (inference) requires expensive memory, time and
+dedicated accelerators such as GPUs and TPUs. Deep learning requires even more
+data and computation. It still works very well in many applications, and the
+lecture states the course's position explicitly: ``This course is not saying
+`don't use deep learning'. It's saying `don't use deep learning only'.'' A
+\textbf{hybrid system} combines a learned model with components that are not
+learned.
+
+\begin{example}[Retrieval-augmented generation]\label{ex:rag}
+  Retrieval-augmented generation (RAG) is a worked case of a hybrid system. A
+  \textbf{retriever} fetches the documents relevant to a question from an
+  external memory, such as Wikipedia, and a \textbf{generator}, a language model,
+  writes the answer from the question and those documents. We can expand the
+  memory to a new domain, or update it with the news, without retraining the
+  model, and each answer can point to the document it comes from, which makes
+  it easier to interpret.
+\end{example}

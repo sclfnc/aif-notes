@@ -1,0 +1,372 @@
+% DRAFT (2026-09-24): written by Claude from the slides and the lecture notes;
+% not yet reviewed by the author.
+\section{Intelligent agents}\label{sec:agents}
+
+% ── slides L2 (02_Intelligent_Agents.pdf); AIMA chapter 2 ──
+The course builds AI systems as agents: systems that perceive an environment and
+act on it. This section fixes the vocabulary for the rest of the course. We
+define what an agent is, when its behavior counts as rational, how to describe
+the task it faces and its environment, which designs of agent exist, and how an
+agent can represent what it knows.
+
+\subsection{Agents and environments}\label{sec:agents-env}
+
+% ── slides L2 p.2–5 ──
+To reason about any AI system we first separate the part that decides from the
+world it decides about.
+
+\begin{definition}[Agent]\label{def:agent}
+  An \textbf{agent} is anything that can act. It perceives its
+  \textbf{environment} through \textbf{sensors} and acts on it through
+  \textbf{actuators}.
+\end{definition}
+
+Where the agent ends and the environment begins is a choice of the designer,
+and the agent must be delimited somehow before we can study it. What the sensors
+deliver at one instant is a \textbf{percept}. Time runs in discrete steps
+$t = 1, 2, \dots$, and at each step the agent receives one percept, so its
+experience accumulates as a sequence of percepts.
+
+\begin{definition}[Agent function]\label{def:agent-function}
+  The \textbf{agent function}, or \textbf{policy}, is a map
+  \[
+    f \colon P^* \to A,
+  \]
+  where $P^*$ is the set of percept histories, the finite sequences of
+  percepts, and $A$ is the set of the agent's actions.
+\end{definition}
+
+In words: the agent function says which action the agent takes after every
+possible history of percepts. We can implement $f$ physically, in a robot, or
+simulate it, in a program.
+
+\begin{example}[Vacuum-cleaner world]\label{ex:vacuum-world}
+  This worked example runs through the rest of the section. The world has two
+  squares, \textsf{A} and \textsf{B}, and the agent is a vacuum cleaner.
+  % The slide writes the squares A and B, clashing with the action set A.
+  % Squares are set in sans serif here to keep A for the actions.
+  \begin{itemize}
+    \item The actions are $A = \{\mathit{Left}, \mathit{Right},
+      \mathit{Suck}, \mathit{NoOp}\}$.
+    \item The position of the agent is $x \in \{\textsf{A}, \textsf{B}\}$.
+    \item The status of the square that the agent occupies is
+      $s_t \in S = \{\mathit{clean}, \mathit{dirty}\}$. The agent knows it
+      only through perception.
+    \item The percept at time $t$ is the pair $(x_t, s_t)$.
+    \item The task is to clean the environment.
+  \end{itemize}
+\end{example}
+
+Building an agent means building $f$. \Cref{alg:reflex-vacuum} is a first
+attempt: it chooses from the current percept alone. It learns nothing and
+contains no AI, because the designer wrote down every case and its action by
+hand.
+
+\begin{algorithm}[htbp]
+  \caption{Reflex vacuum agent}\label{alg:reflex-vacuum}
+  \begin{algorithmic}[1]
+    \Require the percept $(\mathit{location}, \mathit{status})$
+    \Ensure an action
+    \Function{Reflex-Vacuum-Agent}{$\mathit{location}, \mathit{status}$}
+      \If{$\mathit{status} = \mathit{dirty}$}
+        \State \Return $\mathit{Suck}$
+      \ElsIf{$\mathit{location} = \textsf{A}$}
+        \State \Return $\mathit{Right}$
+      \ElsIf{$\mathit{location} = \textsf{B}$}
+        \State \Return $\mathit{Left}$
+      \EndIf
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+\subsection{Rationality}\label{sec:agents-rationality}
+
+% ── slides L2 p.6–8 ──
+Intuitively, \cref{alg:reflex-vacuum} makes sense. To say that it is a
+\emph{good} agent, though, we need a criterion. Most definitions of AI ask the
+agent to do ``the right thing''. They do not mention intelligence at all:
+this narrows the scope of the field, but it makes the goal precise enough to
+build agents toward it.
+
+Moral philosophy offers several notions of the right thing. AI adopts
+\textbf{consequentialism}: we evaluate an agent by the consequences of its
+actions. What counts is the sequence of environment states that its behavior
+produces, not the agent's intentions or its own opinion of its success. The
+choice is natural for a machine, because consequences can be observed and
+measured while intentions cannot. It also comes with a lot of work, since we
+must now say which consequences are good. In a simple world we could list
+them. As the environment grows more complex, no complete evaluation of every
+behavior and its results is possible, so we summarize the good consequences in
+a single number.
+
+\begin{definition}[Performance measure]\label{def:performance-measure}
+  A \textbf{performance measure} evaluates the goodness of an environment state,
+  or of a sequence of environment states.
+\end{definition}
+
+\begin{definition}[Rational agent]\label{def:rational-agent}
+  For each possible percept sequence, a \textbf{rational agent} selects an
+  action that is expected to maximize its performance measure, given the
+  evidence provided by the percept sequence and whatever built-in knowledge the
+  agent has.
+\end{definition}
+
+In words: a rational agent does the best it can with what it has perceived and
+what it knew from the start, where ``best'' is fixed by the performance
+measure. The summary is where the difficulty lies, as Goodhart's law warns:
+``when a measure becomes a target, it ceases to be a good measure''.
+
+\begin{example}[A measure that backfires]\label{ex:goodhart-vacuum}
+  This example shows a measure failing. Suppose that we cannot enter the room
+  to check whether it is clean, so we reward the vacuum cleaner with the grams
+  of dirt that it picks up over a one-hour shift. An agent that maximizes this
+  measure can dump the dirt back on the floor and pick it up again: its score
+  keeps growing and the room is never cleaner. The measure rewarded a behavior
+  that we expected to be useful, instead of the state of the environment that
+  we actually wanted.
+\end{example}
+
+Rationality also asks less than perfection. A rational agent maximizes
+\emph{expected} performance given the percept history, so:
+\begin{itemize}
+  \item \textbf{rational is not omniscient}: the percepts may not supply all
+    the relevant information;
+  \item \textbf{rational is not clairvoyant}: the agent has no access to future
+    percepts;
+  \item \textbf{rational is not successful}: the outcome of an action may not be
+    the expected one.
+\end{itemize}
+In every case, careful engineering of the performance measure, and control of
+the behavior that the agent learns, are key.
+
+\subsection{Fixed action patterns}\label{sec:agents-fixed-patterns}
+
+% ── slides L2 p.9 ──
+An environment that is completely observable and predictable never changes its
+optimal solution, and so it encourages the agent to learn one fixed behavior.
+The result is a fragile agent that follows a \textbf{fixed action pattern}: it
+keeps executing its policy even when the world changes under it.
+
+\begin{example}[The Sphex wasp]\label{ex:sphex}
+  Nature provides a contrast case. After digging a burrow, the Sphex wasp goes
+  out, stings a caterpillar and drags it to the burrow. It enters the burrow to
+  check that all is well, drags the caterpillar inside and lays its eggs. If an
+  entomologist moves the caterpillar a few inches away while the wasp is
+  checking the burrow, the wasp goes back to the ``drag the caterpillar'' step
+  and continues its plan without modification, checking the burrow again. It
+  does so even after dozens of such interventions.
+\end{example}
+
+\subsection{Task environments: PEAS}\label{sec:agents-peas}
+
+% ── slides L2 p.10–11 ──
+Before designing an agent we describe the task that it must solve. A
+\textbf{PEAS} description lists four elements: the \textbf{P}erformance
+measure, the \textbf{E}nvironment, the \textbf{A}ctuators and the
+\textbf{S}ensors. The actuators and the sensors form the \textbf{agent
+architecture}, and the agent is the architecture together with the agent
+function.
+
+\begin{example}[Autonomous taxi]\label{ex:peas-taxi}
+  \Cref{tab:peas-taxi} is a worked PEAS description.
+\end{example}
+
+\begin{table}[htbp]
+  \centering
+  \renewcommand{\arraystretch}{1.08}
+  \caption{PEAS description of an autonomous taxi service.}\label{tab:peas-taxi}
+  \begin{tabularx}{\linewidth}{@{}lX@{}}
+    \toprule
+    \textbf{Element} & \textbf{Autonomous taxi} \\
+    \midrule
+    Performance measure & safety, reaching the destination, profits, legality,
+      comfort, \dots \\
+    Environment & streets and freeways, traffic, pedestrians, weather, \dots \\
+    Actuators & steering, accelerator, brake, horn, speaker or display, \dots \\
+    Sensors & cameras, accelerometers, gauges, engine sensors, keyboard,
+      GPS, \dots \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The more restricted the environment, the easier the design of the agent.
+
+\subsection{Properties of environments}\label{sec:agents-properties}
+
+% ── slides L2 p.12–18. Only the dimensions on the slides: the lecturer said
+% that the other dimensions in AIMA (episodic, static, ...) are not required,
+% although the summary slide p.32 still names episodic and static. ──
+Which agent to build depends on the environment, so we define the environment
+first. We classify it along four dimensions, plus a fifth that concerns what
+the agent knows.
+\begin{itemize}
+  \item \textbf{Observable.} The environment is \textbf{fully observable} if the
+    sensors give access to its complete state, \textbf{partially observable} if
+    faulty sensors or missing information hide part of it, and
+    \textbf{unobservable} if the agent has no sensor information at all.
+  \item \textbf{Deterministic.} The environment is \textbf{deterministic} if the
+    current state and the action uniquely determine the next state, and
+    \textbf{nondeterministic} (or stochastic) if the same state and action can
+    lead to different next states. Partial observability is one possible cause
+    of nondeterminism.
+  \item \textbf{Discrete.} The state of the environment, time, the percepts and
+    the actions can each take \textbf{discrete} or \textbf{continuous} values.
+  \item \textbf{Single agent.} The environment is \textbf{multi-agent} if the
+    performance of our agent depends on the actions of other agents, and
+    \textbf{single-agent} otherwise.
+  \item \textbf{Known.} In a \textbf{known} environment the agent knows its rules,
+    that is, which next state follows from each state and action. A known
+    environment can still be partially observable. In an \textbf{unknown}
+    environment the agent may try to learn the rules.
+\end{itemize}
+
+\Cref{tab:env-examples} classifies three environments. The real world sits in
+the hardest column: like the taxi, it is partially observable,
+nondeterministic, continuous and multi-agent.
+
+\begin{table}[htbp]
+  \centering
+  \renewcommand{\arraystretch}{1.08}
+  \caption{Three environments along the four dimensions.}\label{tab:env-examples}
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    \textbf{Characteristic} & \textbf{Sudoku} & \textbf{Backgammon} &
+      \textbf{Taxi service} \\
+    \midrule
+    Fully observable & yes & yes & no \\
+    Deterministic    & yes & no  & no \\
+    Discrete         & yes & yes & no \\
+    Single-agent     & yes & no  & no \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Types of agent}\label{sec:agents-types}
+
+% ── slides L2 p.19–28 ──
+Agents differ in how they compute the agent function. We go from the simplest
+design to the most flexible one; each design adds a component that removes a
+limit of the previous one.
+
+\subsubsection{Table-driven agents}\label{sec:agents-table}
+
+The most direct way to build $f$ is to write it down. A
+\textbf{table-driven agent} stores its whole percept history and looks up the
+action in a table indexed by percept sequences (\cref{alg:table-driven}).
+
+\begin{algorithm}[htbp]
+  \caption{Table-driven agent}\label{alg:table-driven}
+  \begin{algorithmic}[1]
+    \Require a percept
+    \Ensure an action
+    \Statex \textbf{persistent:} $\mathit{percepts}$, a sequence, initially
+      empty; $\mathit{table}$, a table of actions indexed by percept sequences,
+      initially fully specified
+    \Function{Table-Driven-Agent}{$\mathit{percept}$}
+      \State append $\mathit{percept}$ to the end of $\mathit{percepts}$
+      \State $\mathit{action} \gets \Call{Lookup}{\mathit{percepts},
+        \mathit{table}}$
+      \State \Return $\mathit{action}$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+The design is only feasible in simple environments. With a set $P$ of possible
+percepts, the table needs one entry for each percept sequence, that is,
+$\sum_{t=1}^{T} \abs{P}^t$ entries for an agent that lives $T$ steps. The
+complexity of the environment and of the agent makes the table far too large:
+the design trades efficiency for effectiveness.
+
+\subsubsection{Simple reflex agents}\label{sec:agents-reflex}
+
+A \textbf{simple reflex agent} chooses its action from the current percept
+alone, through \textbf{condition--action rules}: if the percept satisfies a
+condition, then the agent takes the corresponding action. The name comes from
+the body: like a reflex, the agent reacts to the stimulus without consulting
+any memory. \Cref{alg:reflex-vacuum} is a simple reflex agent.
+
+The simplification cuts the cost dramatically. The table of a table-driven agent
+grows exponentially with the lifetime $T$, while a simple reflex agent needs one
+rule per percept, and its work over $T$ steps grows linearly with $T$. It
+simplifies an already naive approach, though: it only works in simple
+environments, and small, fully observable environments are rare.
+
+\subsubsection{Model-based agents}\label{sec:agents-model}
+
+A simple reflex agent fails as soon as the current percept does not reveal the
+state. A \textbf{model-based agent} keeps an \textbf{internal state}, which
+depends on the percept history, and uses it to estimate the current state of
+the environment. Two models update the internal state:
+\begin{itemize}
+  \item the \textbf{transition model} describes how the world evolves, and in
+    particular the consequences of the agent's actions;
+  \item the \textbf{sensor model} describes how the state of the world shows up
+    in the agent's percepts.
+\end{itemize}
+By approximating the entire state, a model-based agent handles partially
+observable environments well. Acquiring such a model is still hard: the lecture
+notes that large language models struggle to acquire a model of the world.%
+\footnote{The slide points to M.~Mitchell, ``LLMs and world models, part 1''.}
+
+\subsubsection{Goal-based agents}\label{sec:agents-goal}
+
+Knowing the state is not enough to know what to do. A \textbf{goal-based agent}
+also represents \textbf{goals}, descriptions of the states it wants to reach,
+and it predicts what the world will be like if it takes an action. To choose,
+it must weigh the immediate reward of an action against the expected long-term
+reward. Two families of methods explore the options: \textbf{search}, which
+navigates the tree of possible decisions, and \textbf{planning}, which exploits
+knowledge about the world to execute the best actions. Later blocks of the
+course study both.
+
+The comparison with a reflex agent shows what goals buy. A reflex agent has no
+notion of a goal: its condition--action rules model a single problem, so a new
+goal means rebuilding the agent from scratch. A goal-based agent represents
+its goals explicitly and can change them.
+
+\subsubsection{Utility-based agents}\label{sec:agents-utility}
+
+A goal only separates success from failure. A \textbf{utility-based agent}
+assigns a value, its \textbf{utility}, to every intermediate state or sequence
+of states, not only to the final goal: utility works as an internal performance
+measure. Utility-based agents are often used in stochastic, partially
+observable environments. There the agent maximizes, for each action, the
+\textbf{expected utility} over the possible results $i$ of the action:
+\[
+  \mathrm{EU} = \sum_{i} p_i \, u_i,
+\]
+where $p_i$ is the probability of result $i$ and $u_i$ is its utility.
+
+\subsubsection{Learning agents}\label{sec:agents-learning}
+
+Every design so far is fixed by its designer. A \textbf{learning agent} improves
+itself through four components:
+\begin{itemize}
+  \item the \textbf{policy} chooses an action, given the context (the percepts
+    and the internal state);
+  \item the \textbf{critic} evaluates the current behavior against an external
+    performance measure and sends feedback;
+  \item the \textbf{learning element} uses the feedback to change the other
+    components;
+  \item the \textbf{problem generator} steers the agent away from greedy
+    behavior by trying out new actions, which balances the critic.
+\end{itemize}
+Learning is orthogonal to the previous types: any of them can be a learning
+agent or not, and learning can modify any of its components.
+
+\subsection{Knowledge representation}\label{sec:agents-representation}
+
+% ── slides L2 p.29–31 (diagrams) ──
+Every agent above represents the world somehow. The lecture places a
+representation on two axes.
+
+\textbf{Expressiveness.} An \textbf{atomic} representation treats each state as
+indivisible, with no internal structure. A \textbf{factored} representation
+describes a state as a vector of attribute values. A \textbf{structured}
+representation describes a state as a graph: objects with their properties and
+the relationships among them. Expressiveness grows from atomic to structured.
+
+\textbf{Distribution.} In a \textbf{localist} representation, concepts and
+memory locations correspond one to one. In a \textbf{distributed}
+representation, one memory cell takes part in several concepts, and one
+concept is spread over several cells.
