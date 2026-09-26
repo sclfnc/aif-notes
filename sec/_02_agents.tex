@@ -38,8 +38,8 @@ history. We can implement it physically, in a robot, or simulate it in a
 program.
 
 \begin{example}[Vacuum-cleaner world]\label{ex:vacuum-world}
-  This worked example runs through the section. A vacuum cleaner moves between
-  two squares, \textsf{A} and \textsf{B}.
+  This worked example runs through the section. The agent is a vacuum cleaner
+  that moves between two squares, \textsf{A} and \textsf{B}.
   % The slide writes the squares A and B, clashing with the action set A.
   % Squares are set in sans serif here to keep A for the actions.
   Its actions are $A = \{\mathit{Left}, \mathit{Right}, \mathit{Suck},
@@ -75,9 +75,9 @@ no AI, because the designer wrote every case by hand.
 
 % ── slides L2 p.6–8 ──
 \Cref{alg:reflex-vacuum} makes sense intuitively, but calling it a \emph{good}
-agent needs a criterion. Most definitions of AI ask the agent to do ``the right
-thing'' and never mention intelligence: this narrows the field, but it makes the
-goal precise enough to build agents toward it.
+agent needs a criterion. The course's criterion asks the agent to do ``the
+right thing'' and does not mention intelligence at all: this narrows the field,
+but it makes the goal precise enough to build agents toward it.
 
 Moral philosophy offers several notions of the right thing. AI adopts
 \textbf{consequentialism}: we evaluate an agent by the consequences of its
@@ -132,8 +132,9 @@ the behavior that the agent learns, are key.
 \subsection{Fixed action patterns}\label{sec:agents-fixed-patterns}
 
 % ── slides L2 p.9 ──
-An environment that is completely observable and predictable never changes its
-optimal solution, so it encourages the agent to learn one fixed behavior. The
+An environment that is static (it does not change while the agent decides),
+completely observable and predictable never changes its optimal solution, so it
+encourages the agent to learn one fixed behavior. The
 result is a fragile agent that follows a \textbf{fixed action pattern}: it
 keeps executing its policy even when the world changes under it.
 
@@ -229,8 +230,9 @@ nondeterministic, continuous and multi-agent.
 
 % ── slides L2 p.19–28 ──
 Agents differ in how they compute the agent function. We go from the simplest
-design to the most flexible one; each design adds a component that removes a
-limit of the previous one.
+design to the most flexible one: each of the first five adds a component that
+removes a limit of the previous one, and learning (\cref{sec:agents-learning})
+can be added to any of them. \Cref{tab:agent-types} summarizes the six.
 
 \subsubsection{Table-driven agents}\label{sec:agents-table}
 
@@ -334,6 +336,32 @@ itself through four components:
 \end{itemize}
 Learning is orthogonal to the previous types: any of them can be a learning
 agent or not, and learning can modify any of its components.
+
+\begin{table}[htbp]
+  \centering
+  \renewcommand{\arraystretch}{1.08}
+  \caption{The six types of agent side by side.}\label{tab:agent-types}
+  \begin{tabularx}{\linewidth}{@{}lLLL@{}}
+    \toprule
+    \textbf{Agent} & \textbf{Chooses the action from} & \textbf{Adds} &
+      \textbf{Limit} \\
+    \midrule
+    Table-driven & the whole percept history, looked up in a table & --- &
+      table size exponential in the lifetime \\
+    Simple reflex & the current percept & condition--action rules &
+      only small, fully observable environments \\
+    Model-based & an internal state estimated from the percept history &
+      transition and sensor models & the model is hard to acquire \\
+    Goal-based & the predicted results of its actions, against its goals &
+      explicit, changeable goals & a goal only separates success from
+      failure \\
+    Utility-based & the expected utility of each action & a utility over states
+      & --- \\
+    Learning & any of the above & critic, learning element, problem generator
+      & --- \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
 \subsection{Knowledge representation}\label{sec:agents-representation}
 
