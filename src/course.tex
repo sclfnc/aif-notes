@@ -55,8 +55,11 @@
 % so that \cref prints the environment's own name (tex-standard, section 1).
 \usepackage{etoolbox}
 % AIF convention: every table body is set in \footnotesize (captions keep the
-% house \small from housestyle's \captionsetup).
-\AtBeginEnvironment{table}{\footnotesize}
+% house \small from housestyle's \captionsetup). Hooked on the tabular
+% environments, not on the table float: the float box resets the font to
+% \normalsize (\@floatboxreset) after any hook at \begin{table}.
+\AtBeginEnvironment{tabular}{\footnotesize}
+\AtBeginEnvironment{tabularx}{\footnotesize}
 \AtBeginEnvironment{theorem}{\crefalias{housethm}{housethm@theorem}}
 \AtBeginEnvironment{lemma}{\crefalias{housethm}{housethm@lemma}}
 \AtBeginEnvironment{proposition}{\crefalias{housethm}{housethm@proposition}}
